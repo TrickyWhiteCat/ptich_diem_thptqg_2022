@@ -5,7 +5,7 @@ import plotly.express as px
 from data import *
 import util
 
-dash.register_page(__name__, path='/')
+dash.register_page("Phân tích điểm thi THPTQG 2022", path='/')
 
 
 all_graphs = []

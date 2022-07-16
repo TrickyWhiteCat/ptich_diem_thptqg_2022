@@ -1,10 +1,9 @@
 import dash
-from dash import Dash, dcc, html, Input, Output, State, callback, ALL
+from dash import dcc, html
 import util
 from data import *
-from dash.exceptions import PreventUpdate
 import plotly.express as px
-dash.register_page(__name__, path_template="/analytics/<sbd>")
+dash.register_page("Phân tích điểm thí sinh", path_template="/analytics/<sbd>")
 
 
 def layout(sbd=0, **custom):
