@@ -3,3 +3,6 @@
 testing.ipynb
 debug.py
 __pycache__
+venv
+.DS_Store
+.env

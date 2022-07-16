@@ -56,6 +56,7 @@ def submit_combination(click, subjects, multis):
 es = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es)
 app.config.suppress_callback_exceptions=True
+server = app.server
 
 app.layout = html.Div([
 	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
