@@ -4,7 +4,6 @@ import dash
 from dash import Dash, dcc, html, Input, Output, State, callback, ALL
 from data import *
 from dash.exceptions import PreventUpdate
-import flask
 
 
 @callback(
@@ -57,10 +56,9 @@ def submit_combination(click, subjects, multis):
 
 
 es = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-server = flask.Flask(__name__)
-app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es, server=server)
-app.config.suppress_callback_exceptions=True
+app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es)
 server=app.server
+app.config.suppress_callback_exceptions=True
 app.layout = html.Div([
 	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
 	dash.page_container
