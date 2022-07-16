@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import unidecode
 
-data = pd.read_csv(r"app\data\total.csv", low_memory=False)
+data = pd.read_csv(r"app/data/total.csv", low_memory=False)
 
 sbd = data['SBD']
 diem = data.drop(columns=['SBD', 'Tên', 'Ngày Sinh', 'Giới tính'])
