@@ -25,19 +25,12 @@ def higher(data: pd.DataFrame, value):
     temp = data[data >= value].count()
     return f'{temp}'
 
-def custom_combi(custom: dict, sbd = None):
+def custom_combi(valid: dict, sbd = None):
     '''Return a graph of a custom combination of subjects
     Param:
     custom: a dictionary containing subjects and their multipliers
     sbd
     '''
-    valid = {}
-    for val in custom.keys():
-        if val in subjects_lower:
-            try:
-                valid[val] = int(custom[val])
-            except ValueError:
-                pass
     custom_data = sum([(diem[subjects[subjects_lower.index(val)]] * valid[val]) for val in valid.keys()])
     data_to_plot = custom_data.value_counts().sort_index()
     title = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {valid[val]})' for val in valid.keys()])
@@ -65,4 +58,13 @@ def custom_combi(custom: dict, sbd = None):
                 dcc.Graph(figure=fig, className='graph'),
                 info,
                 ])
-    
+
+def remove_redundant_queries(query_str):
+    valid = {}
+    for val in query_str.keys():
+        if val in subjects_lower:
+            try:
+                valid[val] = int(query_str[val])
+            except ValueError:
+                pass
+    return valid

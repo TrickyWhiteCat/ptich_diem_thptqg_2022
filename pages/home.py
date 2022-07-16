@@ -50,6 +50,7 @@ def sbd_callback(submitted, input_val):
             return f'Thay vì nhập {input_val}, xin hãy nhập một số báo danh hợp lệ.'
 
 def layout(**custom):
+    custom = util.remove_redundant_queries(custom)
     # Buttons to create custom combinations of subjects
     ## Combination container
     sj_container = html.Div(id='sj_container', children=[])

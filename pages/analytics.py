@@ -8,6 +8,7 @@ dash.register_page(__name__, path_template="/analytics/<sbd>")
 
 
 def layout(sbd=0, **custom):
+    custom = util.remove_redundant_queries(custom)
     if sbd:
         d = util.tra_diem(data, diem, sbd)
 

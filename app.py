@@ -49,7 +49,7 @@ def submit_combination(click, subjects, multis):
             return 'Hãy nhập hệ số là số nguyên'
         combination[item[0]] = int(item[1])
     if combination: # User may create a bunch of fields but fill in none of them. Only redirect when something valid was provided
-        query_str = '&'.join([f"{val}={combination[val]}" for val in combination.keys()])
+        query_str = '&'.join([f"{val.replace(' ', '%20')}={combination[val]}" for val in combination.keys()])
         return dcc.Location(id = 'redirect-query', pathname='/', search=f'?{query_str}')
 
 
@@ -66,4 +66,4 @@ app.layout = html.Div([
     )
 
 if __name__ == '__main__':
-	app.run_server(debug=True)
+	app.run_server(debug=False)
