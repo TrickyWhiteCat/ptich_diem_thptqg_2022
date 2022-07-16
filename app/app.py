@@ -4,7 +4,8 @@ import dash
 from dash import Dash, dcc, html, Input, Output, State, callback, ALL
 from data import *
 from dash.exceptions import PreventUpdate
-import plotly.express as px
+import flask
+
 
 @callback(
     Output(component_id='sj_container', component_property= 'children'),
@@ -53,10 +54,12 @@ def submit_combination(click, subjects, multis):
         return dcc.Location(id = 'redirect-query', pathname='/', search=f'?{query_str}')
 
 
+
+
 es = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
-app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es)
+server = flask.Flask(__name__)
+app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es, server=server)
 app.config.suppress_callback_exceptions=True
-server = app.server
 
 app.layout = html.Div([
 	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
