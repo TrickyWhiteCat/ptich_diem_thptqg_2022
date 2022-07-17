@@ -32,7 +32,6 @@ def sbd_callback(submitted, input_val):
 
 def layout(**custom):
     custom = util.remove_redundant_queries(custom)
-    all_graphs = util.create_graphs()
     # Buttons to create custom combinations of subjects
     ## Combination container
     sj_container = html.Div(id='sj_container', children=[])
@@ -45,7 +44,10 @@ def layout(**custom):
     
     # Provide a custom graph if query string is provided
     if custom:
+        all_graphs = util.create_graphs()
         all_graphs.insert(0, util.custom_combi(custom))
+    else:
+        all_graphs = util.create_graphs()
     return html.Div(
         children=([get_sbd, user_sbd,
         sj_container,

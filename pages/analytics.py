@@ -13,8 +13,6 @@ def layout(sbd=0, **custom):
     if sbd:
         custom = util.remove_redundant_queries(custom)
     
-            # Create graphs for every subjects
-        all_graphs = util.create_graphs(sbd)
             # Buttons to create custom combinations of subjects
     
             ## Combination container
@@ -31,7 +29,10 @@ def layout(sbd=0, **custom):
     
             # Provide a custom graph if query string is provided
         if custom:
+            all_graphs = util.create_graphs(sbd)
             all_graphs.insert(0, util.custom_combi(custom, sbd))
+        else:
+            all_graphs = util.create_graphs(sbd)
     
         return html.Div(
                         children = [
