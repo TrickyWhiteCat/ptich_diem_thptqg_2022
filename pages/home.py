@@ -8,25 +8,6 @@ import util
 dash.register_page(__name__, path='/')
 
 
-all_graphs = []
-for col in diem.columns:
-
-    data_to_plot = diem[col].value_counts().sort_index()
-    fig = px.line(x = data_to_plot.index.sort_values(), y = data_to_plot, title=f'Điểm thi môn {col}', template="ggplot2")
-    fig.update_layout(xaxis_title='Điểm', yaxis_title='Số thí sinh')
-    
-    info = html.Div(className='info', children = 
-                [html.H6(f'Điểm trung bình: {diem[col].mean():.2f}'),
-                html.H6(f'Số điểm nhiều thí sinh đạt được nhất: {diem[col].mode().iloc[0]}'),
-                html.H6(f'Độ lệch chuẩn: {diem[col].std():.2f}'),
-                ])
-                    
-    all_graphs.append(
-        html.Div(className = 'fig_container' ,children=[
-            dcc.Graph(figure=fig, className='graph'),
-            info,
-            ]))
-
 get_sbd = html.Div(style={'text-align': 'center', 'margin': '20px'},children = 
                 [dcc.Input(id = 'id_input', placeholder= 'Nhập số báo danh của bạn', type='text'), 
                 html.Button(id='submit-button', type='submit', children='Submit')]
@@ -51,6 +32,7 @@ def sbd_callback(submitted, input_val):
 
 def layout(**custom):
     custom = util.remove_redundant_queries(custom)
+    all_graphs = util.create_graphs()
     # Buttons to create custom combinations of subjects
     ## Combination container
     sj_container = html.Div(id='sj_container', children=[])
