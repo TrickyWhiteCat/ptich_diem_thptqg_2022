@@ -1,3 +1,4 @@
+from cProfile import label
 from matplotlib.pyplot import title
 import pandas as pd
 import numpy as np
@@ -141,7 +142,7 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
         return np.nan_to_num(res/custom_data.count()) * 100
     return res
 
-def choropleth_map(mon, muc_diem, percent = False, region = None):
+def choropleth_map(mon, muc_diem, percent = True, region = None):
 
     # Load geojson file. Just don't touch it
     import json
@@ -168,7 +169,48 @@ def choropleth_map(mon, muc_diem, percent = False, region = None):
         sjs = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {mon[val]})' for val in mon.keys()])
     fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} trên cả nước {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {subjects[subjects_lower.index(mon)]}"}')
 
-
     return html.Div(className='choropleth-container',
                     children=[
                         dcc.Graph(figure=fig)])
+
+def choropleth_w_slider(to_hop: dict, percent = True, region = None, id = None):
+    '''A wrapper containing a slider controlling `muc_diem` and a choropleth_map'''
+
+    # Get the max possible score
+    max_score = sum([val for val in to_hop.values()])
+
+    container = html.Div(id = {'type':'choro', 'index':id},
+                        className='choro-w-slider',
+                        children=[
+                            dcc.RadioItems(options=[
+                                {
+                                    'label':html.Div(children='Tỉ lệ'),
+                                    'value':True
+                                },
+                                {
+                                    'label':html.Div(children='Tổng'),
+                                    'value':False}
+                                ],
+                                id = {'type': 'percent_sum', 'index':id}),
+                            dcc.RadioItems(options=[
+                                {
+                                    'label':html.Div(children='Miền Bắc'),
+                                    'value':'bac'
+                                },
+                                {
+                                    'label':html.Div(children='Miền Trung'),
+                                    'value':'trung'},
+                                {
+                                    'label':html.Div(children='Miền Nam'),
+                                    'value':'nam'
+                                },
+                                {
+                                    'label':html.Div(children='Toàn quốc'),
+                                    'value':None
+                                }
+                                ],
+                                id = {'type': 'percent_sum', 'index':id}),
+                            html.Div(), #Will be handled by callback
+                            dcc.Slider(min = 0, max = max_score, step = 1, id={'type': 'slider', 'index': id}, value=max_score/2),
+                            dcc.Input(value=max_score/2, id = {'type':'slider-input', 'index': id})
+                            ]) 

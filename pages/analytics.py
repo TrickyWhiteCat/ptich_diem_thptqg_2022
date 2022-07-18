@@ -5,7 +5,6 @@ from data import *
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 
-from util.func import bang_diem
 dash.register_page(__name__, path_template="/analytics/<sbd>")
 
 
@@ -24,15 +23,20 @@ def layout(sbd=0, **custom):
             ## Press this button to submit the custom combination
         submit = html.Button('Submit', id='submit-combination')
         res_submit = html.Div(id='res-submit')
-            
-        bang_diem(sbd)
+
+        # Create graphs for each subject
+        subjs = util.tra_diem(sbd).index # Tất cả các môn có điểm
+        all_graphs = [] # just a container
+
+        for val in subjs:
+            if val == 'Văn':
+                all_graphs.append(util.create_graph(sbd = sbd, mon = val, graph_type='line'))
+            else:
+                all_graphs.append(util.create_graph(sbd = sbd, mon = val))
     
             # Provide a custom graph if query string is provided
         if custom:
-            all_graphs = util.create_graphs(sbd)
-            all_graphs.insert(0, util.custom_combi(custom, sbd))
-        else:
-            all_graphs = util.create_graphs(sbd)
+            all_graphs = [util.custom_combi(custom, sbd)]
     
         return html.Div(
                         children = [

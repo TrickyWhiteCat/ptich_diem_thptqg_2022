@@ -1,9 +1,11 @@
 from dash import Dash, html, dcc
 import dash
 import dash
-from dash import Dash, dcc, html, Input, Output, State, callback, ALL
+from dash import Dash, dcc, html, Input, Output, State, callback, ALL, MATCH
 from data import *
 from dash.exceptions import PreventUpdate
+
+import util
 
 
 @callback(
@@ -51,6 +53,44 @@ def submit_combination(click, subjects, multis):
     if combination: # User may create a bunch of fields but fill in none of them. Only redirect when something valid was provided
         query_str = '&'.join([f"{val.replace(' ', '%20')}={combination[val]}" for val in combination.keys()])
         return dcc.Location(id = 'redirect-query', pathname='/', search=f'?{query_str}')
+
+@callback(
+    Output(component_id= {'type':'choro', 'index':MATCH}, component_property='children'),
+    Input(component_id={'type': 'slider', 'index':MATCH}, component_property='value'),
+    [State(component_id={'type': 'percent_sum', 'index':MATCH}, component_property='value'),
+    State(component_id={'type': 'region', 'index': MATCH}, component_property='value')]
+)
+def set_level(value):
+    return util.
+
+@callback(
+    Output(component_id={'type': 'slider', 'index':MATCH}, component_property= "value"),
+    Output(component_id={'type': 'slider-input', 'index':MATCH}, component_property= "value"),
+    Input(component_id={'type': 'slider', 'index':MATCH}, component_property= "value"),
+    Input(component_id={'type': 'slider-input', 'index':MATCH}, component_property= "value"),
+)
+def callback(input_value, slider_value):
+    import json
+    ctx = dash.callback_context
+    trigger_id = json.loads(ctx.triggered[0]["prop_id"].split(".")[0])
+    value = input_value if trigger_id['type'] == 'slider-input' else slider_value
+    return value, value
+
+@callback(
+        Output('user-sbd', component_property='children'),
+        Input('submit-button', 'n_clicks'),
+        State('id_input', 'value')
+)
+def sbd_callback(submitted, input_val):
+    if submitted:
+        if not input_val:
+            return ''
+        try:
+            if len(input_val) != 8: raise ValueError # So bao danh hop le dai 8 ki tu
+            if int(input_val):
+                return dcc.Location(id = 'redirect', pathname=f'analytics\{input_val}')
+        except ValueError:
+            return f'Thay vì nhập {input_val}, xin hãy nhập một số báo danh hợp lệ.'
 
 
 

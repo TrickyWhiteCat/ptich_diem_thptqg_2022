@@ -73,3 +73,7 @@ table {
 button {
     display: flex;
 }
+
+.fig_container {
+    background-color: green;
+}
