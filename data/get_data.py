@@ -4,7 +4,7 @@ import unidecode
 
 data = pd.read_csv(r"data/total.csv", low_memory=False)
 
-sbd = data['SBD']
+SBD = data['SBD']
 diem = data.drop(columns=['SBD', 'Tên', 'Ngày Sinh', 'Giới tính'])
 
 info = pd.DataFrame([diem.median(), diem.mode().iloc[0], diem.mean(numeric_only=True).round(2)], index=('Median', 'Mode', 'Mean'))

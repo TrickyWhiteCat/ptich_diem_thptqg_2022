@@ -133,3 +133,27 @@ def bang_diem(sbd):
                 [html.Td(className = 'score', style ={'text-align': 'center', 'border': '1px solid black'}, children = score) for score in d.values])
                 ])
 
+def diem_theo_tinh(ma_tinh, diem = diem, sbd = SBD):
+    return diem.loc[SBD // 1000000 == int(ma_tinh)]
+
+def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem):
+    return df_diem[mon].loc[df_diem[mon] >= muc_diem].count()
+
+def choroplet_map(mon: str):
+    import json
+    with open(r'data/diaphantinh.geojson') as f:
+        map_ = json.load(f)
+    ma_tinh = list(range(1, 65))
+    ma_tinh.remove(20)
+    ma_tinh = pd.Series(ma_tinh)
+    diem_moi_tinh = pd.concat([ma_tinh, ma_tinh.map(lambda x: count_cao_hon_hoac_bang(muc_diem = 9, mon = mon, df_diem = diem_theo_tinh(x)))], axis = 1)
+    diem_moi_tinh.columns = ['id', 'count']
+    fig = px.choropleth(data_frame=diem_moi_tinh,
+                                geojson=map_,
+                                locations = 'id',
+                                featureidkey='properties.id',
+                                color='count',
+                                center = {'lon':15.938536, 'lat': 107.594403})
+    fig.update_geos(fitbounds = 'locations', visible = False)
+    fig.show()
+choroplet_map('Ngoại Ngữ')
