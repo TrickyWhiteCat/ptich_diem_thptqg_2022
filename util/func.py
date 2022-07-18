@@ -1,9 +1,11 @@
+from matplotlib.pyplot import title
 import pandas as pd
 import numpy as np
 from data import *
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 from dash import html, dcc
+import plotly.graph_objects as go
 
 
 def tra_diem(data, diem, sbd: str):
@@ -136,24 +138,46 @@ def bang_diem(sbd):
 def diem_theo_tinh(ma_tinh, diem = diem, sbd = SBD):
     return diem.loc[SBD // 1000000 == int(ma_tinh)]
 
-def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem):
-    return df_diem[mon].loc[df_diem[mon] >= muc_diem].count()
+def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
+    if isinstance(mon, dict):
+        custom_data = sum([(df_diem[subjects[subjects_lower.index(val)]] * mon[val]) for val in mon.keys()])
+    else:
+        try:
+            custom_data = df_diem[mon]
+        except KeyError:
+            custom_data = df_diem[subjects[subjects_lower.index(mon)]]
+    res = custom_data.loc[custom_data >= muc_diem].dropna().count()
+    if percent:
+        return np.nan_to_num(res/custom_data.count()) * 100
+    return res
 
-def choroplet_map(mon: str):
+def choropleth_map(mon, muc_diem, percent = False):
     import json
-    with open(r'data/diaphantinh.geojson') as f:
+    with open(r'data/diaphantinh.geojson', encoding='utf8') as f:
         map_ = json.load(f)
-    ma_tinh = list(range(1, 65))
-    ma_tinh.remove(20)
-    ma_tinh = pd.Series(ma_tinh)
-    diem_moi_tinh = pd.concat([ma_tinh, ma_tinh.map(lambda x: count_cao_hon_hoac_bang(muc_diem = 9, mon = mon, df_diem = diem_theo_tinh(x)))], axis = 1)
-    diem_moi_tinh.columns = ['id', 'count']
-    fig = px.choropleth(data_frame=diem_moi_tinh,
-                                geojson=map_,
-                                locations = 'id',
-                                featureidkey='properties.id',
-                                color='count',
-                                center = {'lon':15.938536, 'lat': 107.594403})
+    tinh = pd.DataFrame([[tinh['properties']["id"], tinh['properties']["ten_tinh"]] for tinh in map_['features']])
+    diem_moi_tinh = pd.concat([tinh, tinh[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, df_diem = diem_theo_tinh(x), percent=percent))], axis = 1)
+    diem_moi_tinh.columns = ['id', 'name', 'value']
+
+    fig = go.Figure(data=
+                    go.Choropleth(
+                        geojson=map_,
+                        locations = diem_moi_tinh['id'],
+                        featureidkey='properties.id',
+                        z=diem_moi_tinh['value'],
+                        text=diem_moi_tinh['name'],
+                        colorscale='blugrn'))
+
     fig.update_geos(fitbounds = 'locations', visible = False)
+
+    if isinstance(mon, dict): # Hiển thị tổ hợp nếu `mon` là 1 dictionary
+        sjs = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {mon[val]})' for val in mon.keys()])
+    fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} trên cả nước {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {subjects[subjects_lower.index(mon)]}"}')
+
     fig.show()
-choroplet_map('Ngoại Ngữ')
+
+    return html.Div(className='choropleth-container',
+                    children=[
+                        dcc.Graph(figure=fig)])
+
+choropleth_map(mon = {'toan': 2, 'ly': 1, 'ngoai ngu': 1}, muc_diem=36, percent=True)
