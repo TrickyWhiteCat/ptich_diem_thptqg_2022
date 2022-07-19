@@ -7,7 +7,7 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 from dash import html, dcc
 import plotly.graph_objects as go
-
+import json
 
 def tra_diem(sbd: str, data = data, diem = diem):
     return diem.loc[data['SBD'] == int(sbd)].iloc[0].dropna()
@@ -145,7 +145,6 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
 def choropleth_map(mon, muc_diem, percent = True, region = None):
 
     # Load geojson file. Just don't touch it
-    import json
     with open(r'data/diaphantinh.geojson', encoding='utf8') as f:
         map_ = json.load(f)
 
@@ -173,13 +172,20 @@ def choropleth_map(mon, muc_diem, percent = True, region = None):
                     children=[
                         dcc.Graph(figure=fig)])
 
-def choropleth_w_slider(to_hop: dict, percent = True, region = None, id = None):
+def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_obj = None):
     '''A wrapper containing a slider controlling `muc_diem` and a choropleth_map'''
 
     # Get the max possible score
-    max_score = sum([val for val in to_hop.values()])
+    if isinstance(to_hop, dict):
+        max_score = sum([val for val in to_hop.values()])
+    if isinstance(to_hop, str):
+        max_score = 10
+    else: TypeError(f'to_hop must be either string or dictionary. Got {type(to_hop)} instead')
 
-    container = html.Div(id = {'type':'choro', 'index':id},
+    if not muc_diem:
+        muc_diem = max_score/2
+
+    container = html.Div(id = {'type':'choro', 'index':id_obj, 'subject':to_hop},
                         className='choro-w-slider',
                         children=[
                             dcc.RadioItems(options=[
@@ -189,9 +195,10 @@ def choropleth_w_slider(to_hop: dict, percent = True, region = None, id = None):
                                 },
                                 {
                                     'label':html.Div(children='Tổng'),
-                                    'value':False}
+                                    'value':False
+                                }
                                 ],
-                                id = {'type': 'percent_sum', 'index':id}),
+                                id = {'type': 'percent_sum', 'index':id_obj}),
                             dcc.RadioItems(options=[
                                 {
                                     'label':html.Div(children='Miền Bắc'),
@@ -199,18 +206,27 @@ def choropleth_w_slider(to_hop: dict, percent = True, region = None, id = None):
                                 },
                                 {
                                     'label':html.Div(children='Miền Trung'),
-                                    'value':'trung'},
+                                    'value':'trung'
+                                },
                                 {
                                     'label':html.Div(children='Miền Nam'),
                                     'value':'nam'
                                 },
                                 {
                                     'label':html.Div(children='Toàn quốc'),
-                                    'value':None
-                                }
+                                    'value':''
+                                },
                                 ],
-                                id = {'type': 'percent_sum', 'index':id}),
-                            html.Div(), #Will be handled by callback
-                            dcc.Slider(min = 0, max = max_score, step = 1, id={'type': 'slider', 'index': id}, value=max_score/2),
-                            dcc.Input(value=max_score/2, id = {'type':'slider-input', 'index': id})
+                                id = {'type': 'region', 'index':id_obj}),
+                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
+                            dcc.Slider(min = 0,
+                                        max = max_score,
+                                        step = None,
+                                        id={'type': 'slider', 'index': id_obj},
+                                        value=max_score/2,
+                                        included=True),
+                            dcc.Input(value=max_score/2,
+                                    id = {'type':'slider-input', 'index': id_obj},
+                                    type='number')
                             ]) 
+    return container

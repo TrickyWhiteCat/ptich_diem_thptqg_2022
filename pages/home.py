@@ -37,10 +37,12 @@ def layout(**custom):
     if custom:
         all_graphs= [util.custom_combi(custom)]
     return html.Div(
-        children=([get_sbd, user_sbd,
-        sj_container,
-        add_button,
-        submit,
-        res_submit,
-        ]
-     + all_graphs))
+        children=([get_sbd,
+            user_sbd,
+            util.choropleth_w_slider(to_hop = 'toan', muc_diem = 5, id_obj = 0),
+            sj_container,
+            add_button,
+            submit,
+            res_submit,
+            ]
+            + all_graphs))

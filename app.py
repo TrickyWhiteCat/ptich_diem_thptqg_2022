@@ -4,7 +4,7 @@ import dash
 from dash import Dash, dcc, html, Input, Output, State, callback, ALL, MATCH
 from data import *
 from dash.exceptions import PreventUpdate
-
+from numpy import seterr
 import util
 
 
@@ -43,7 +43,8 @@ def submit_combination(click, subjects, multis):
         raise PreventUpdate
     combination = {}
     for item in zip(subjects, multis):
-        if not (item[0] and item[1]): continue # Skip empty field
+        if not (item[0] and item[1]):
+            continue # Skip empty field
         try:
             if int(item[1]) != float(item[1]):
                 raise ValueError
@@ -57,11 +58,15 @@ def submit_combination(click, subjects, multis):
 @callback(
     Output(component_id= {'type':'choro', 'index':MATCH}, component_property='children'),
     Input(component_id={'type': 'slider', 'index':MATCH}, component_property='value'),
-    [State(component_id={'type': 'percent_sum', 'index':MATCH}, component_property='value'),
-    State(component_id={'type': 'region', 'index': MATCH}, component_property='value')]
+    [State(component_id= {'type':'choro', 'index':MATCH}, component_property='id'),
+    State(component_id={'type': 'region', 'index': MATCH}, component_property='value'),
+    State(component_id={'type': 'percent_sum', 'index':MATCH}, component_property='value'),]
 )
-def set_level(value):
-    return util.
+def set_level(muc_diem, id_obj, percent = True, region = None):
+    if muc_diem and id_obj:
+        return util.choropleth_w_slider(to_hop = id['mon'], muc_diem=muc_diem, percent=percent, region=region)
+
+
 
 @callback(
     Output(component_id={'type': 'slider', 'index':MATCH}, component_property= "value"),
@@ -69,11 +74,12 @@ def set_level(value):
     Input(component_id={'type': 'slider', 'index':MATCH}, component_property= "value"),
     Input(component_id={'type': 'slider-input', 'index':MATCH}, component_property= "value"),
 )
-def callback(input_value, slider_value):
-    import json
+def match_input_slider(slider_value, input_value):
     ctx = dash.callback_context
-    trigger_id = json.loads(ctx.triggered[0]["prop_id"].split(".")[0])
-    value = input_value if trigger_id['type'] == 'slider-input' else slider_value
+    if not ctx.triggered:
+        raise PreventUpdate
+    trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
+    value = input_value if 'slider-input' in trigger_id else slider_value
     return value, value
 
 @callback(
@@ -106,4 +112,5 @@ app.layout = html.Div([
     )
 
 if __name__ == '__main__':
-	app.run_server(debug=True)
+    seterr(invalid='ignore')
+    app.run_server(debug=True)
