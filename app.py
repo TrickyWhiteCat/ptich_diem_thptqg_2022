@@ -56,16 +56,21 @@ def submit_combination(click, subjects, multis):
         return dcc.Location(id = 'redirect-query', pathname='/', search=f'?{query_str}')
 
 @callback(
-    Output(component_id= {'type':'choro', 'index':MATCH}, component_property='children'),
-    Input(component_id={'type': 'slider', 'index':MATCH}, component_property='value'),
-    [State(component_id= {'type':'choro', 'index':MATCH}, component_property='id'),
-    State(component_id={'type': 'region', 'index': MATCH}, component_property='value'),
-    State(component_id={'type': 'percent_sum', 'index':MATCH}, component_property='value'),]
+    Output(component_id= {'type':'choro-w-slider', 'index':MATCH, 'subject': ALL}, component_property='children'),
+    [Input(component_id={'type': 'slider-input', 'index':MATCH}, component_property='value'),
+    Input(component_id={'type': 'region', 'index': MATCH}, component_property='value'),
+    Input(component_id={'type': 'percent_sum', 'index':MATCH}, component_property='value')],
+    [State(component_id= {'type':'choro-w-slider', 'index':MATCH, 'subject': ALL}, component_property='id'),
+    State(component_id= {'type':'choro-w-slider', 'index':MATCH, 'subject': ALL}, component_property='children'),]
 )
-def set_level(muc_diem, id_obj, percent = True, region = None):
-    if muc_diem and id_obj:
-        return util.choropleth_w_slider(to_hop = id['mon'], muc_diem=muc_diem, percent=percent, region=region)
-
+def set_level(input_value, region, percent, id_obj, children):
+    id_obj = id_obj[0] # id_obj's type was "list"
+    children[0][2] = util.choropleth_map(mon = id_obj['subject'],
+                                    muc_diem = input_value,
+                                    percent = percent,
+                                    region = region,
+                                    idx = id_obj['index'])
+    return children
 
 
 @callback(

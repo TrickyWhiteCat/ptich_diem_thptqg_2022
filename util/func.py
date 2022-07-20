@@ -142,20 +142,14 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
         return np.nan_to_num(res/custom_data.count()) * 100
     return res
 
-def choropleth_map(mon, muc_diem, percent = True, region = None):
-
-    # Load geojson file. Just don't touch it
-    with open(r'data/diaphantinh.geojson', encoding='utf8') as f:
-        map_ = json.load(f)
-
-    tinh = pd.DataFrame([[tinh['properties']["id"], tinh['properties']["ten_tinh"]] for tinh in map_['features']])
+def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
 
     diem_moi_tinh = pd.concat([tinh, tinh[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, df_diem = diem_theo_tinh(x), percent=percent))], axis = 1)
     diem_moi_tinh.columns = ['id', 'name', 'value']
 
     fig = go.Figure(data=
                     go.Choropleth(
-                        geojson=map_,
+                        geojson=vn_map,
                         locations = diem_moi_tinh['id'],
                         featureidkey='properties.id',
                         z=diem_moi_tinh['value'],
@@ -185,7 +179,7 @@ def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_
     if not muc_diem:
         muc_diem = max_score/2
 
-    container = html.Div(id = {'type':'choro', 'index':id_obj, 'subject':to_hop},
+    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':to_hop},
                         className='choro-w-slider',
                         children=[
                             dcc.RadioItems(options=[
@@ -198,6 +192,7 @@ def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_
                                     'value':False
                                 }
                                 ],
+                                value = True,
                                 id = {'type': 'percent_sum', 'index':id_obj}),
                             dcc.RadioItems(options=[
                                 {
@@ -217,8 +212,9 @@ def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_
                                     'value':''
                                 },
                                 ],
+                                value = '',
                                 id = {'type': 'region', 'index':id_obj}),
-                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
+                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region, idx = id_obj),
                             dcc.Slider(min = 0,
                                         max = max_score,
                                         step = None,
