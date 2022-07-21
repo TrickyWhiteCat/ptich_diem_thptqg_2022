@@ -10,7 +10,7 @@ dash.register_page(__name__, path='/')
 
 get_sbd = html.Div(children = 
                 [dcc.Input(id = 'id_input', placeholder= 'Nhập số báo danh của bạn', type='text'), 
-                html.Button(id='submit-button', type='submit', children='Submit')]
+                html.Button(id='submit-button', type='submit', children='Gửi')]
 )
 user_sbd = html.Div(id = 'user-sbd')
 
@@ -21,9 +21,9 @@ def layout(**custom):
     sj_container = html.Div(id='sj_container', children=[])
     
     ## Add a subject to the combination
-    add_button = html.Button('Add', id='add-subject')
+    add_button = html.Button('Thêm môn học', id='add-subject')
     ## Press this button to submit the custom combination
-    submit = html.Button('Submit', id='submit-combination')
+    submit = html.Button('Gửi', id='submit-combination')
     res_submit = html.Div(id='res-submit')
     
     all_graphs = []
