@@ -143,6 +143,7 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
 
 def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
 
+    location_str = 'trên cả nước' if region == 'all' else 'tại miền Bắc' if region == 'bac' else 'tại miền Nam' if region == 'nam' else 'tại miền Trung'
     regions = {'bac': bac, 'nam': nam, 'trung': trung, 'all': tinh}
     region = regions[region] # Du lieu dau vao la 1 str
 
@@ -166,7 +167,7 @@ def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
             sjs = ", ".join([f'{val} (hệ số {mon[val]})' for val in mon.keys()])
         else:
             sjs = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {mon[val]})' for val in mon.keys()])
-    fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} trên cả nước {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {mon}" if mon in subjects else f"ở môn {subjects[subjects_lower.index(mon)]}"}')
+    fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {mon}" if mon in subjects else f"ở môn {subjects[subjects_lower.index(mon)]}"} {location_str}')
 
     return html.Div(className='choropleth-container',
                     children=[
