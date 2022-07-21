@@ -5,6 +5,9 @@ from dash import Dash, dcc, html, Input, Output, State, callback, ALL, MATCH
 from data import *
 from dash.exceptions import PreventUpdate
 from numpy import seterr
+
+import json
+
 import util
 
 
@@ -65,7 +68,12 @@ def submit_combination(click, subjects, multis):
 )
 def set_level(input_value, region, percent, id_obj, children):
     id_obj = id_obj[0] # id_obj's type was "list"
-    children[0][2] = util.choropleth_map(mon = id_obj['subject'],
+    if id_obj['subject'] and region:
+        try:
+            mon = json.loads(id_obj['subject'])
+        except json.decoder.JSONDecodeError:
+            mon = id_obj['subject']
+        children[0][2] = util.choropleth_map(mon = mon,
                                     muc_diem = input_value,
                                     percent = percent,
                                     region = region,

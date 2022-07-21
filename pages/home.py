@@ -27,19 +27,18 @@ def layout(**custom):
     res_submit = html.Div(id='res-submit')
     
     all_graphs = []
-    for val in subjects:
+    for idx, val in enumerate(subjects):
         if val == 'Văn':
-            all_graphs.append(util.create_graph(mon = val, graph_type='line'))
+            all_graphs+=[util.create_graph(mon = val, graph_type='line'),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
         else:
-            all_graphs.append(util.create_graph(mon = val))
+            all_graphs+=[util.create_graph(mon = val),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
     
     # Provide a custom graph if query string is provided
     if custom:
-        all_graphs= [util.custom_combi(custom)]
+        all_graphs= [util.custom_combi(custom), util.choropleth_w_slider(to_hop=custom, id_obj=idx+1)]
     return html.Div(
         children=([get_sbd,
             user_sbd,
-            util.choropleth_w_slider(to_hop = 'toan', muc_diem = 5, id_obj = 0),
             sj_container,
             add_button,
             submit,
