@@ -8,27 +8,11 @@ import util
 dash.register_page(__name__, path='/')
 
 
-get_sbd = html.Div(style={'text-align': 'center', 'margin': '20px'},children = 
+get_sbd = html.Div(children = 
                 [dcc.Input(id = 'id_input', placeholder= 'Nhập số báo danh của bạn', type='text'), 
                 html.Button(id='submit-button', type='submit', children='Submit')]
 )
-user_sbd = html.Div(style={'textAlign': 'center'})
-
-@callback(
-        Output(user_sbd, component_property='children'),
-        Input('submit-button', 'n_clicks'),
-        State('id_input', 'value')
-)
-def sbd_callback(submitted, input_val):
-    if submitted:
-        if not input_val:
-            return ''
-        try:
-            if len(input_val) != 8: raise ValueError # So bao danh hop le dai 8 ki tu
-            if int(input_val):
-                return dcc.Location(id = 'redirect', pathname=f'analytics\{input_val}')
-        except ValueError:
-            return f'Thay vì nhập {input_val}, xin hãy nhập một số báo danh hợp lệ.'
+user_sbd = html.Div(id = 'user-sbd')
 
 def layout(**custom):
     custom = util.remove_redundant_queries(custom)
@@ -42,17 +26,22 @@ def layout(**custom):
     submit = html.Button('Submit', id='submit-combination')
     res_submit = html.Div(id='res-submit')
     
+    all_graphs = []
+    for idx, val in enumerate(subjects):
+        if val == 'Văn':
+            all_graphs+=[util.create_graph(mon = val, graph_type='line'),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
+        else:
+            all_graphs+=[util.create_graph(mon = val),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
+    
     # Provide a custom graph if query string is provided
     if custom:
-        all_graphs = util.create_graphs()
-        all_graphs.insert(0, util.custom_combi(custom))
-    else:
-        all_graphs = util.create_graphs()
+        all_graphs= [util.custom_combi(custom), util.choropleth_w_slider(to_hop=custom, id_obj=idx+1)]
     return html.Div(
-        children=([get_sbd, user_sbd,
-        sj_container,
-        add_button,
-        submit,
-        res_submit,
-        ]
-     + all_graphs))
+        children=([get_sbd,
+            user_sbd,
+            sj_container,
+            add_button,
+            submit,
+            res_submit,
+            ]
+            + all_graphs))
