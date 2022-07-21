@@ -126,4 +126,4 @@ app.layout = html.Div([
 
 if __name__ == '__main__':
     seterr(invalid='ignore')
-    app.run_server(debug=True)
+    app.run_server(debug=False)
