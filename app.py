@@ -116,6 +116,7 @@ def sbd_callback(submitted, input_val):
 
 es = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets=es)
+app.title = 'Dashboard'
 server=app.server
 app.config.suppress_callback_exceptions=True
 app.layout = html.Div([

@@ -1,11 +1,10 @@
-
 import dash
 from dash import Dash, dcc, html, Input, State, Output, callback
 import plotly.express as px
 from data import *
 import util
 
-dash.register_page(__name__, path='/')
+dash.register_page(__name__, path='/', title='Dashboard')
 
 
 get_sbd = html.Div(children = 

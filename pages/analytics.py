@@ -5,7 +5,7 @@ from data import *
 from dash.exceptions import PreventUpdate
 import plotly.express as px
 
-dash.register_page(__name__, path_template="/analytics/<sbd>")
+dash.register_page(__name__, path_template="/analytics/<sbd>", title='Thí sinh')
 
 
 def layout(sbd=0, **custom):
