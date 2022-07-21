@@ -139,12 +139,16 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
             custom_data = df_diem[subjects[subjects_lower.index(mon)]]
     res = custom_data.loc[custom_data >= muc_diem].dropna().count()
     if percent:
+        np.seterr('ignore')
         return np.nan_to_num(res/custom_data.count()) * 100
     return res
 
 def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
 
-    diem_moi_tinh = pd.concat([tinh, tinh[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, df_diem = diem_theo_tinh(x), percent=percent))], axis = 1)
+    regions = {'bac': bac, 'nam': nam, 'trung': trung, 'all': tinh}
+    region = regions[region] # Du lieu dau vao la 1 str
+
+    diem_moi_tinh = pd.concat([region, region[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, df_diem = diem_theo_tinh(x), percent=percent))], axis = 1)
     diem_moi_tinh.columns = ['id', 'name', 'value']
 
     fig = go.Figure(data=
@@ -154,24 +158,28 @@ def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
                         featureidkey='properties.id',
                         z=diem_moi_tinh['value'],
                         text=diem_moi_tinh['name'],
-                        colorscale='blugrn'))
+                        colorscale='blugrn',
+                        colorbar_title = 'Phần trăm (%)' if percent else 'Số lượng (người)'))
 
     fig.update_geos(fitbounds = 'locations', visible = False)
 
     if isinstance(mon, dict): # Hiển thị tổ hợp nếu `mon` là 1 dictionary
-        sjs = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {mon[val]})' for val in mon.keys()])
-    fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} trên cả nước {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {subjects[subjects_lower.index(mon)]}"}')
+        if list(mon.values())[0] in subjects:
+            sjs = ", ".join([f'{val} (hệ số {mon[val]})' for val in mon.keys()])
+        else:
+            sjs = ", ".join([f'{subjects[subjects_lower.index(val)]} (hệ số {mon[val]})' for val in mon.keys()])
+    fig.update_layout(title_text=f'{"Số lượng" if not percent else "Tỉ lệ"} thí sinh đạt mức điểm cao hơn hoặc bằng {muc_diem} trên cả nước {f"trong tổ hợp {sjs}" if isinstance(mon, dict) else f"ở môn {mon}" if mon in subjects else f"ở môn {subjects[subjects_lower.index(mon)]}"}')
 
     return html.Div(className='choropleth-container',
                     children=[
                         dcc.Graph(figure=fig)])
 
-def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_obj = None):
+def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, region = 'all'):
     '''A wrapper containing a slider controlling `muc_diem` and a choropleth_map'''
 
     # Get the max possible score
     if isinstance(to_hop, dict):
-        max_score = sum([val for val in to_hop.values()])
+        max_score = 10 * sum([val for val in to_hop.values()])
     if isinstance(to_hop, str):
         max_score = 10
     else: TypeError(f'to_hop must be either string or dictionary. Got {type(to_hop)} instead')
@@ -179,7 +187,7 @@ def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_
     if not muc_diem:
         muc_diem = max_score/2
 
-    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':to_hop},
+    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':str(to_hop).replace("\'", "\"")}, #json string needs to be started with " instead of '
                         className='choro-w-slider',
                         children=[
                             dcc.RadioItems(options=[
@@ -209,10 +217,10 @@ def choropleth_w_slider(to_hop, muc_diem = 0, percent = True, region = None, id_
                                 },
                                 {
                                     'label':html.Div(children='Toàn quốc'),
-                                    'value':''
+                                    'value':'all'
                                 },
                                 ],
-                                value = '',
+                                value = 'all',
                                 id = {'type': 'region', 'index':id_obj}),
                             choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region, idx = id_obj),
                             dcc.Slider(min = 0,
