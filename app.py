@@ -1,7 +1,4 @@
-from dash import Dash, html, dcc
-import dash
-import dash
-from dash import Dash, dcc, html, Input, Output, State, callback, ALL, MATCH
+from dash import Dash, dcc, html, Input, Output, State, callback, ALL, MATCH, callback_context, page_container
 from data import *
 from dash.exceptions import PreventUpdate
 from numpy import seterr
@@ -88,7 +85,7 @@ def set_level(input_value, region, percent, id_obj, children):
     Input(component_id={'type': 'slider-input', 'index':MATCH}, component_property= "value"),
 )
 def match_input_slider(slider_value, input_value):
-    ctx = dash.callback_context
+    ctx = callback_context
     if not ctx.triggered:
         raise PreventUpdate
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
@@ -121,7 +118,7 @@ server=app.server
 app.config.suppress_callback_exceptions=True
 app.layout = html.Div([
 	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
-	dash.page_container
+	page_container
     ]
     )
 

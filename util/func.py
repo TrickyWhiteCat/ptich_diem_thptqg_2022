@@ -5,7 +5,6 @@ from dash.exceptions import PreventUpdate
 import plotly.express as px
 from dash import html, dcc
 import plotly.graph_objects as go
-import json
 
 def tra_diem(sbd: str, data = data, diem = diem):
     return diem.loc[data['SBD'] == int(sbd)].iloc[0].dropna()
