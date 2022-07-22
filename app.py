@@ -73,8 +73,7 @@ def set_level(input_value, region, percent, id_obj, children):
         children[0][2] = util.choropleth_map(mon = mon,
                                     muc_diem = input_value,
                                     percent = percent,
-                                    region = region,
-                                    idx = id_obj['index'])
+                                    region = region)
     return children
 
 

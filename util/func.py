@@ -126,27 +126,39 @@ def bang_diem(sbd):
 def diem_theo_tinh(ma_tinh, diem = diem, sbd = SBD):
     return diem.loc[SBD // 1000000 == int(ma_tinh)]
 
-def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
-    if isinstance(mon, dict):
-        custom_data = sum([(df_diem[subjects[subjects_lower.index(val)]] * mon[val]) for val in mon.keys()])
+def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False, ma_sgd = 0):
+
+    if not isinstance(mon, dict):
+        if ma_sgd:
+            try:
+                df_diem[mon] # Kiem tra xem `mon` co dau, viet hoa khong
+                mon = subjects_lower[subjects.index(mon)]
+            except KeyError: # Trong truong hop nay, `mon` la ten mon hoc (khong dau, viet thuong). Ta chi can load file da tinh san
+                pass
+            
+            df = pd.read_pickle(f'data/{ma_sgd}/{mon}.gz')
+
+            return df['count'].loc[df['muc_diem'] >= muc_diem].max() # Explanation: First we sort out rows that has `muc_diem` >= muc_diem and then get the highest value of cells in `count` column of those rows
+        else:
+            try:
+                custom_data = df_diem[mon]
+            except KeyError:
+                custom_data = df_diem[subjects[subjects_lower.index(mon)]]
     else:
-        try:
-            custom_data = df_diem[mon]
-        except KeyError:
-            custom_data = df_diem[subjects[subjects_lower.index(mon)]]
+        custom_data = sum([(df_diem[subjects[subjects_lower.index(val)]] * mon[val]) for val in mon.keys()])
     res = custom_data.loc[custom_data >= muc_diem].dropna().count()
     if percent:
         np.seterr('ignore')
         return np.nan_to_num(res/custom_data.count()) * 100
     return res
 
-def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
+def choropleth_map(mon, muc_diem, percent = True, region = tinh):
 
     location_str = 'trên cả nước' if region == 'all' else 'tại miền Bắc' if region == 'bac' else 'tại miền Nam' if region == 'nam' else 'tại miền Trung'
     regions = {'bac': bac, 'nam': nam, 'trung': trung, 'all': tinh}
     region = regions[region] # Du lieu dau vao la 1 str
 
-    diem_moi_tinh = pd.concat([region, region[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, df_diem = diem_theo_tinh(x), percent=percent))], axis = 1)
+    diem_moi_tinh = pd.concat([region, region[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, percent=percent, ma_sgd = x))], axis = 1)
     diem_moi_tinh.columns = ['id', 'name', 'value']
 
     fig = go.Figure(data=
@@ -220,7 +232,7 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
                                 ],
                                 value = 'all',
                                 id = {'type': 'region', 'index':id_obj}),
-                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region, idx = id_obj),
+                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
                             dcc.Slider(min = 0,
                                         max = max_score,
                                         step = None,
