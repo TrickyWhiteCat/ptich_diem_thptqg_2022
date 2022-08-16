@@ -137,8 +137,12 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False, ma_s
                 pass
             
             df = pd.read_pickle(f'data/{ma_sgd}/{mon}.gz')
+            
+            temp = df['count'].loc[df['muc_diem'] >= muc_diem].max()
+            if not temp: # There might be no row that sastified the condition. In that case we want the function to return 0
+                return 0
+            return temp / df['count'].max() * 100 if percent else temp
 
-            return df['count'].loc[df['muc_diem'] >= muc_diem].max() # Explanation: First we sort out rows that has `muc_diem` >= muc_diem and then get the highest value of cells in `count` column of those rows
         else:
             try:
                 custom_data = df_diem[mon]
@@ -158,7 +162,7 @@ def choropleth_map(mon, muc_diem, percent = True, region = tinh):
     regions = {'bac': bac, 'nam': nam, 'trung': trung, 'all': tinh}
     region = regions[region] # Du lieu dau vao la 1 str
 
-    diem_moi_tinh = pd.concat([region, region[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, percent=percent, ma_sgd = x))], axis = 1)
+    diem_moi_tinh = pd.concat([region, region[0].map(lambda x: count_cao_hon_hoac_bang(muc_diem = muc_diem, mon = mon, percent=percent, ma_sgd = x))], axis = 1).fillna(0)
     diem_moi_tinh.columns = ['id', 'name', 'value']
 
     fig = go.Figure(data=

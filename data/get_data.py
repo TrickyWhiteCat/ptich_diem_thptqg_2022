@@ -6,7 +6,7 @@ import json
 data = pd.read_csv(r"data/total.csv", low_memory=False)
 
 SBD = data['SBD']
-diem = data.drop(columns=['SBD', 'Tên', 'Ngày Sinh', 'Giới tính'])
+diem = data.drop(columns=['SBD'])
 
 info = pd.DataFrame([diem.median(), diem.mode().iloc[0], diem.mean(numeric_only=True).round(2)], index=('Median', 'Mode', 'Mean'))
 subjects = tuple(diem.columns)
