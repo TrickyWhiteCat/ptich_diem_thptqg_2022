@@ -1,13 +1,12 @@
+
 th {
-    background-color: rgb(255, 238, 0);
+    background-color: rgb(247, 242, 184);
     text-align: center;
-    outline: 1px;
 }
 
 td {
     background-color: rgb(236, 245, 245);
     text-align: center;
-    outline: 1px;
 }
 
 .fig_container {
@@ -71,5 +70,14 @@ table {
 }
 
 button {
-    display: flex;
+    display: inline-block;
+}
+
+#sbd {
+    text-align: center;
+}
+
+label {
+    display: inline-block;
+    padding: 20px
 }

@@ -74,7 +74,7 @@ def set_level(input_value, region, percent, id_obj, children):
                                     muc_diem = input_value,
                                     percent = percent,
                                     region = region,
-                                    idx = id_obj['index'])
+                                    )
     return children
 
 
@@ -104,9 +104,17 @@ def sbd_callback(submitted, input_val):
         try:
             if len(input_val) != 8: raise ValueError # So bao danh hop le dai 8 ki tu
             if int(input_val):
-                return dcc.Location(id = 'redirect', pathname=f'analytics\{input_val}')
+                return dcc.Location(id = 'redirect_sbd', pathname=f'analytics\{input_val}')
         except ValueError:
             return f'Thay vì nhập {input_val}, xin hãy nhập một số báo danh hợp lệ.'
+
+@callback(
+        Output('red_to_choro_out', component_property='children'), # Doesn't matter at all since this callback is used to redirect user to another page
+        Input('red_choro', component_property='n_clicks'),
+)
+def red_to_choro(clicked):
+    if clicked:
+        return dcc.Location(id = 'redirect_to_choro', pathname=f'choro')
 
 
 
@@ -116,12 +124,19 @@ app = Dash(__name__, use_pages=True, pages_folder=r"pages", external_stylesheets
 app.title = 'Dashboard'
 server=app.server
 app.config.suppress_callback_exceptions=True
+
+redirect_to_choro = html.Div([
+                        html.Button('So sánh điểm thi giữa các tỉnh', id = 'red_choro'),
+                        html.Div(id = 'red_to_choro_out'), # A placeholder to store the output of red_to_choro
+])
+
 app.layout = html.Div([
 	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
+    redirect_to_choro,
 	page_container
     ]
     )
 
 if __name__ == '__main__':
     seterr(invalid='ignore')
-    app.run_server(debug=False)
+    app.run_server(debug=True)

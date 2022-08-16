@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from data import *
-from dash.exceptions import PreventUpdate
 import plotly.express as px
 from dash import html, dcc
 import plotly.graph_objects as go
@@ -118,9 +117,9 @@ def bang_diem(sbd):
     return html.Table(
         children=[
             html.Tr(className='subjects', children=
-                [html.Th(className = 'subject', style={'text-align': 'center', 'border': '1px solid black'}, children = subject) for subject in d.index]),
+                [html.Th(className = 'subject', children = subject) for subject in d.index]),
             html.Tr(className = 'scores', children=
-                [html.Td(className = 'score', style ={'text-align': 'center', 'border': '1px solid black'}, children = score) for score in d.values])
+                [html.Td(className = 'score', children = score) for score in d.values])
                 ])
 
 def diem_theo_tinh(ma_tinh, diem = diem, sbd = SBD):
@@ -140,7 +139,7 @@ def count_cao_hon_hoac_bang(muc_diem, mon, df_diem = diem, percent = False):
         return np.nan_to_num(res/custom_data.count()) * 100
     return res
 
-def choropleth_map(mon, muc_diem, percent = True, region = tinh, idx = None):
+def choropleth_map(mon, muc_diem, percent = True, region = tinh):
 
     location_str = 'trên cả nước' if region == 'all' else 'tại miền Bắc' if region == 'bac' else 'tại miền Nam' if region == 'nam' else 'tại miền Trung'
     regions = {'bac': bac, 'nam': nam, 'trung': trung, 'all': tinh}
@@ -185,10 +184,14 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
     if not muc_diem:
         muc_diem = max_score/2
 
-    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':str(to_hop).replace("\'", "\"")}, #json string needs to be started with " instead of '
+    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':str(to_hop).replace("\'", "\"")}, #json strings need to be started with " instead of '
                         className='choro-w-slider',
                         children=[
-                            dcc.RadioItems(options=[
+                            html.Div(children = [
+                                'Chọn cách tính số lượng',
+                                dcc.RadioItems(
+                                className = 'opt', 
+                                options=[
                                 {
                                     'label':html.Div(children='Tỉ lệ'),
                                     'value':True
@@ -200,7 +203,10 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
                                 ],
                                 value = True,
                                 id = {'type': 'percent_sum', 'index':id_obj}),
-                            dcc.RadioItems(options=[
+                            ]),
+                            dcc.RadioItems(children = 'Chọn vùng miền',
+                                className = 'opt', 
+                                options=[
                                 {
                                     'label':html.Div(children='Miền Bắc'),
                                     'value':'bac'
@@ -220,7 +226,7 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
                                 ],
                                 value = 'all',
                                 id = {'type': 'region', 'index':id_obj}),
-                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region, idx = id_obj),
+                            choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
                             dcc.Slider(min = 0,
                                         max = max_score,
                                         step = None,

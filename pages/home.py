@@ -8,7 +8,7 @@ dash.register_page(__name__, path='/', title='Dashboard')
 
 
 get_sbd = html.Div(children = 
-                [dcc.Input(id = 'id_input', placeholder= 'Nhập số báo danh của bạn', type='text'), 
+                [dcc.Input(id = 'id_input', placeholder= 'Nhập số báo danh', type='text'), 
                 html.Button(id='submit-button', type='submit', children='Gửi')]
 )
 user_sbd = html.Div(id = 'user-sbd')
@@ -28,13 +28,13 @@ def layout(**custom):
     all_graphs = []
     for idx, val in enumerate(subjects):
         if val == 'Văn':
-            all_graphs+=[util.create_graph(mon = val, graph_type='line'),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
+            all_graphs+=[util.create_graph(mon = val, graph_type='line')]
         else:
-            all_graphs+=[util.create_graph(mon = val),  util.choropleth_w_slider(to_hop=val, id_obj=idx)]
+            all_graphs+=[util.create_graph(mon = val)]
     
     # Provide a custom graph if query string is provided
     if custom:
-        all_graphs= [util.custom_combi(custom), util.choropleth_w_slider(to_hop=custom, id_obj=idx+1)]
+        all_graphs = [util.custom_combi(custom)]
     return html.Div(
         children=([get_sbd,
             user_sbd,
