@@ -36,7 +36,10 @@ def layout(sbd=0, **custom):
     
             # Provide a custom graph if query string is provided
         if custom:
-            all_graphs = [util.custom_combi(custom, sbd)]
+            all_graphs = util.create_graphs(sbd)
+            all_graphs.insert(0, util.custom_combi(custom, sbd))
+        else:
+            all_graphs = util.create_graphs(sbd)
     
         return html.Div(
                         children = [
