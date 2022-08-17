@@ -1,9 +1,7 @@
 import dash
-from dash import Dash, dcc, html, Input, Output, State, callback, ALL
+from dash import html
 import util
 from data import *
-from dash.exceptions import PreventUpdate
-import plotly.express as px
 
 dash.register_page(__name__, path_template="/analytics/<sbd>", title='Thí sinh')
 
@@ -19,10 +17,12 @@ def layout(sbd=0, **custom):
     
             
             ## Add a subject to the combination
-        add_button = html.Button('Add', id='add-subject')
+        add_button = html.Button('Thêm môn học', id='add-subject')
             ## Press this button to submit the custom combination
-        submit = html.Button('Submit', id='submit-combination')
+        submit = html.Button('Gửi', id='submit-combination')
         res_submit = html.Div(id='res-submit')
+
+        submit_custom = html.Div(children=[add_button, submit, res_submit])
 
         # Create graphs for each subject
         subjs = util.tra_diem(sbd).index # Tất cả các môn có điểm
@@ -40,10 +40,9 @@ def layout(sbd=0, **custom):
     
         return html.Div(
                         children = [
+                            submit_custom,
                             sj_container,
-                            add_button, submit,
-                            res_submit,
-                            html.H4(children = f'Số báo danh: {sbd}', style={'text-align': 'center'}),
+                            html.H4(children = f'Số báo danh: {sbd}', id = 'sbd'),
                             util.bang_diem(sbd),
                                     ] + all_graphs
             )

@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from data import *
-from dash.exceptions import PreventUpdate
 import plotly.express as px
 from dash import html, dcc
 import plotly.graph_objects as go
@@ -118,9 +117,9 @@ def bang_diem(sbd):
     return html.Table(
         children=[
             html.Tr(className='subjects', children=
-                [html.Th(className = 'subject', style={'text-align': 'center', 'border': '1px solid black'}, children = subject) for subject in d.index]),
+                [html.Th(className = 'subject', children = subject) for subject in d.index]),
             html.Tr(className = 'scores', children=
-                [html.Td(className = 'score', style ={'text-align': 'center', 'border': '1px solid black'}, children = score) for score in d.values])
+                [html.Td(className = 'score', children = score) for score in d.values])
                 ])
 
 def diem_theo_tinh(ma_tinh, diem = diem, sbd = SBD):
@@ -197,41 +196,50 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
     if not muc_diem:
         muc_diem = max_score/2
 
-    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':str(to_hop).replace("\'", "\"")}, #json string needs to be started with " instead of '
+    container = html.Div(id = {'type':'choro-w-slider', 'index':id_obj, 'subject':str(to_hop).replace("\'", "\"")}, #json strings need to be started with " instead of '
                         className='choro-w-slider',
                         children=[
-                            dcc.RadioItems(options=[
-                                {
-                                    'label':html.Div(children='Tỉ lệ'),
-                                    'value':True
-                                },
-                                {
-                                    'label':html.Div(children='Tổng'),
-                                    'value':False
-                                }
+                            html.Div(children = [
+                                'Chọn cách tính số lượng',
+                                dcc.RadioItems(
+                                    className = 'opt', 
+                                    options=[
+                                                {
+                                                    'label':html.Div(children='Tỉ lệ'),
+                                                    'value':True
+                                                },
+                                                {
+                                                    'label':html.Div(children='Tổng'),
+                                                    'value':False
+                                                }
                                 ],
                                 value = True,
                                 id = {'type': 'percent_sum', 'index':id_obj}),
-                            dcc.RadioItems(options=[
-                                {
-                                    'label':html.Div(children='Miền Bắc'),
-                                    'value':'bac'
-                                },
-                                {
-                                    'label':html.Div(children='Miền Trung'),
-                                    'value':'trung'
-                                },
-                                {
-                                    'label':html.Div(children='Miền Nam'),
-                                    'value':'nam'
-                                },
-                                {
-                                    'label':html.Div(children='Toàn quốc'),
-                                    'value':'all'
-                                },
-                                ],
+                            ]),
+                            html.Div(children = [
+                                'Chọn vùng miền',
+                                dcc.RadioItems(children = 'Chọn vùng miền',
+                                    className = 'opt', 
+                                    options=[
+                                                {
+                                                    'label':html.Div(children='Miền Bắc'),
+                                                    'value':'bac'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Miền Trung'),
+                                                    'value':'trung'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Miền Nam'),
+                                                    'value':'nam'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Toàn quốc'),
+                                                    'value':'all'
+                                                },
+                                                ],
                                 value = 'all',
-                                id = {'type': 'region', 'index':id_obj}),
+                                id = {'type': 'region', 'index':id_obj}),]),
                             choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
                             dcc.Slider(min = 0,
                                         max = max_score,
