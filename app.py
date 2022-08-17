@@ -125,18 +125,24 @@ app.title = 'Dashboard'
 server=app.server
 app.config.suppress_callback_exceptions=True
 
-redirect_to_choro = html.Div([
+redirect_to_choro = html.Div(id= 'to-choro',
+                        children=[
                         html.Button('So sánh điểm thi giữa các tỉnh', id = 'red_choro'),
                         html.Div(id = 'red_to_choro_out'), # A placeholder to store the output of red_to_choro
 ])
 
-app.layout = html.Div([
-	html.H1(id = 'header',children = ['Phân tích điểm thi THPT Quốc Gia 2022'], style={'text-align': 'center'}),
-    redirect_to_choro,
-	page_container
+app.layout = html.Div(
+        children=[
+            html.A(id = 'header',
+                    children = [
+	                    html.H1(children = ['Phân tích điểm thi THPT Quốc Gia 2022']),
+                        ],
+                    href='/'),
+            redirect_to_choro,
+	        page_container
     ]
     )
 
 if __name__ == '__main__':
     seterr(invalid='ignore')
-    app.run_server(debug=True)
+    app.run_server(debug=False)

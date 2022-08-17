@@ -190,42 +190,44 @@ def choropleth_w_slider(to_hop, muc_diem = 0, id_obj = None, percent = True, reg
                             html.Div(children = [
                                 'Chọn cách tính số lượng',
                                 dcc.RadioItems(
-                                className = 'opt', 
-                                options=[
-                                {
-                                    'label':html.Div(children='Tỉ lệ'),
-                                    'value':True
-                                },
-                                {
-                                    'label':html.Div(children='Tổng'),
-                                    'value':False
-                                }
+                                    className = 'opt', 
+                                    options=[
+                                                {
+                                                    'label':html.Div(children='Tỉ lệ'),
+                                                    'value':True
+                                                },
+                                                {
+                                                    'label':html.Div(children='Tổng'),
+                                                    'value':False
+                                                }
                                 ],
                                 value = True,
                                 id = {'type': 'percent_sum', 'index':id_obj}),
                             ]),
-                            dcc.RadioItems(children = 'Chọn vùng miền',
-                                className = 'opt', 
-                                options=[
-                                {
-                                    'label':html.Div(children='Miền Bắc'),
-                                    'value':'bac'
-                                },
-                                {
-                                    'label':html.Div(children='Miền Trung'),
-                                    'value':'trung'
-                                },
-                                {
-                                    'label':html.Div(children='Miền Nam'),
-                                    'value':'nam'
-                                },
-                                {
-                                    'label':html.Div(children='Toàn quốc'),
-                                    'value':'all'
-                                },
-                                ],
+                            html.Div(children = [
+                                'Chọn vùng miền',
+                                dcc.RadioItems(children = 'Chọn vùng miền',
+                                    className = 'opt', 
+                                    options=[
+                                                {
+                                                    'label':html.Div(children='Miền Bắc'),
+                                                    'value':'bac'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Miền Trung'),
+                                                    'value':'trung'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Miền Nam'),
+                                                    'value':'nam'
+                                                },
+                                                {
+                                                    'label':html.Div(children='Toàn quốc'),
+                                                    'value':'all'
+                                                },
+                                                ],
                                 value = 'all',
-                                id = {'type': 'region', 'index':id_obj}),
+                                id = {'type': 'region', 'index':id_obj}),]),
                             choropleth_map(mon = to_hop, muc_diem = muc_diem, percent = percent, region = region),
                             dcc.Slider(min = 0,
                                         max = max_score,

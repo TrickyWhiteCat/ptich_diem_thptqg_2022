@@ -13,6 +13,8 @@ get_sbd = html.Div(children =
 )
 user_sbd = html.Div(id = 'user-sbd')
 
+submit_sbd = html.Div(id = 'submit-sbd', children = [get_sbd, user_sbd])
+
 def layout(**custom):
     custom = util.remove_redundant_queries(custom)
     # Buttons to create custom combinations of subjects
@@ -24,6 +26,8 @@ def layout(**custom):
     ## Press this button to submit the custom combination
     submit = html.Button('Gửi', id='submit-combination')
     res_submit = html.Div(id='res-submit')
+
+    submit_custom = html.Div(children=[add_button, submit, res_submit])
     
     all_graphs = []
     for idx, val in enumerate(subjects):
@@ -36,11 +40,8 @@ def layout(**custom):
     if custom:
         all_graphs = [util.custom_combi(custom)]
     return html.Div(
-        children=([get_sbd,
-            user_sbd,
+        children=([submit_sbd,
+            submit_custom,
             sj_container,
-            add_button,
-            submit,
-            res_submit,
             ]
             + all_graphs))

@@ -79,5 +79,23 @@ button {
 
 label {
     display: inline-block;
-    padding: 20px
+    padding: 5px
+}
+
+:root {
+    --width-choro-submit: 30vw
+}
+
+#to-choro {
+    text-align: center;
+}
+
+#submit-sbd {
+    text-align: center;
+}
+
+#header {
+    text-align: center;
+    text-decoration: solid;
+    color: black;
 }

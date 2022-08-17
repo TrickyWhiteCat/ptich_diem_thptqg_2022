@@ -18,16 +18,16 @@ def layout(**custom):
     submit = html.Button('Gửi', id='submit-combination')
     res_submit = html.Div(id='res-submit')
 
+    submit_custom = html.Div(children=[add_button, submit, res_submit])
+
     if custom:
         graph = util.choropleth_w_slider(to_hop=custom, id_obj=17)
     else:
-        graph = html.Div()
+        graph = html.Div(className = 'placeholder', children= ['Hãy chọn môn học'])
 
     return html.Div(
             children = [
+                submit_custom,
                 sj_container,
-                add_button,
-                submit,
-                res_submit,
                 graph, # Just a random number..
             ])
